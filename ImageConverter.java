@@ -25,6 +25,7 @@ public class ImageConverter {
         }
         arrayToImage(x2);
     }
+
     public static int[][] imageToArray(String imagePath) {
         try {
             BufferedImage image = ImageIO.read(new File(imagePath));
