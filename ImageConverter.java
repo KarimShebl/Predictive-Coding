@@ -8,10 +8,10 @@ public class ImageConverter {
     public static void main(String[] args) throws IOException {
         int[][] x = imageToArray("grey.jpeg");
 
-        int[][] x2 = new int[200][200];
+        int[][] x2 = new int[100][100];
 
-        for (int i = 0; i < x2.length; i++) {
-            for (int j = 0; j < x2[0].length; j++) {
+        for (int i = 60, a = 0; a < x2.length; i++, a++) {
+            for (int j = 60, b = 0; b < x2[0].length; j++, b++) {
                 int vr, vg, vb;
                 // vr = (x[i][j] >> 16) & 0xFF;
                 // vg = (x[i][j] >> 8) & 0xFF;
@@ -20,10 +20,10 @@ public class ImageConverter {
                 // int value = 0xff000000 | ((int) vf << 16) | ((int) vf << 8) | (int) vf;
                 // // int value = x[i + 60][j + 150];
                 // x2[i][j] = value;
-                x2[i][j] = x[i][j];
+                x2[a][b] = x[i][j];
             }
         }
-        arrayToImage(x2);
+        arrayToImage(x2, "test");
     }
 
     public static int[][] imageToArray(String imagePath) {
@@ -46,7 +46,7 @@ public class ImageConverter {
         }
     }
 
-    public static void arrayToImage(int[][] pixelArray) {
+    public static void arrayToImage(int[][] pixelArray, String outing) {
         int height = pixelArray.length;
         int width = pixelArray[0].length;
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -61,7 +61,7 @@ public class ImageConverter {
 
         try {
             String projectPath = System.getProperty("user.dir");
-            ImageIO.write(image, "png", new File(projectPath + File.separator + "output" + ".png"));
+            ImageIO.write(image, "png", new File(projectPath + File.separator + outing + ".png"));
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,23 +1,28 @@
 public class Main {
     public static void main(String[] args) {
-        int[][] array = {{5, 7, 8, 10}, {6, 6, 9, 11}, {7, 8, 11, 13}, {9, 10, 11, 14}};
+        int[][] array = { { 5, 7, 8, 10 }, { 6, 6, 9, 11 }, { 7, 8, 11, 13 }, { 9, 10, 11, 14 } };
         PredictiveCompressor p = new PredictiveCompressor();
-        int[][] pixelArray = ImageConverter.imageToArray("tst3.png");
+        int[][] pixelArray = ImageConverter.imageToArray("grey.jpeg");
 
         for (int i = 0; i < pixelArray.length; ++i)
             for (int j = 0; j < pixelArray[0].length; ++j)
-                pixelArray[i][j] &= 255;
+                pixelArray[i][j] = (int) 0x0 | (pixelArray[i][j] & 255);
 
         int[][] compressed = p.Compress(pixelArray, 3);
+        // int[][] compressed = p.Compress(array, 1);
+
         int[][] img = p.Decompress(compressed);
+        System.out.println(HelpMe.getMax(img));
+        System.out.println(HelpMe.getMin(img));
         for (int i = 0; i < img.length; ++i) {
             for (int j = 0; j < img[0].length; ++j) {
-                int val = img[i][j];
-                img[i][j] |= (val << 8);
-                img[i][j] |= (val << 16);
-                img[i][j] |= (int)0xff000000;
+                int blue = img[i][j];
+                int green = (blue << 8);
+                int red = (blue << 16);
+                img[i][j] = (int) 0xff000000 | red | green | blue;
             }
         }
-        ImageConverter.arrayToImage(img);
+        ImageConverter.arrayToImage(img, "output");
+
     }
 }

@@ -1,7 +1,5 @@
-import java.util.HashMap;
-import java.util.List;
 
-public class PredictiveCompressor implements Compressor {
+public class PredictiveCompressor extends Compressor {
 
     private int[][] computePredictedArray(int[][] image) {
         int height = image.length;
@@ -12,11 +10,11 @@ public class PredictiveCompressor implements Compressor {
                 int val;
                 if (Math.min(image[i][j - 1], image[i - 1][j]) >= image[i - 1][j - 1])
                     val = Math.max(image[i][j - 1], image[i - 1][j]);
-                else if(Math.max(image[i][j - 1], image[i - 1][j]) <= image[i - 1][j - 1])
+                else if (Math.max(image[i][j - 1], image[i - 1][j]) <= image[i - 1][j - 1])
                     val = Math.min(image[i][j - 1], image[i - 1][j]);
                 else
                     val = image[i][j - 1] + image[i - 1][j] - image[i - 1][j - 1];
-                int difference = image[i][j] - val;
+                predictedArray[i][j] = val;
             }
         }
         return predictedArray;
@@ -43,15 +41,15 @@ public class PredictiveCompressor implements Compressor {
     }
 
     @Override
-    public int[][] Compress(int[][] image, int bits) {
+    protected int[][] Compress(int[][] image, int bits) {
         int[][] predicted = computePredictedArray(image);
         int[][] difference = computeDifferenceArray(image, predicted);
         int mx = HelpMe.getMax(difference);
         int mi = HelpMe.getMin(difference);
         Quantizer.buildQuantizedData(mi, mx, bits);
-        return computeQuantizedArray(difference);
+        var temp = computeQuantizedArray(difference);
+        return temp;
     }
-
 
     private int[][] computeDeQuantizedArray(int[][] quantizedDifference) {
         int height = quantizedDifference.length;
@@ -59,14 +57,13 @@ public class PredictiveCompressor implements Compressor {
         int[][] DeQuantizedArray = HelpMe.deepCopy(quantizedDifference);
         for (int i = 1; i < height; i++)
             for (int j = 1; j < width; j++) {
-                if(quantizedDifference[i][j] != Integer.MAX_VALUE)
+                if (quantizedDifference[i][j] != Integer.MAX_VALUE)
                     DeQuantizedArray[i][j] = Quantizer.getDeQuantizedCode(quantizedDifference[i][j]);
             }
         return DeQuantizedArray;
     }
 
-    private int[][] computeDecodedImage(int[][] deQuantized)
-    {
+    private int[][] computeDecodedImage(int[][] deQuantized) {
         int height = deQuantized.length;
         int width = deQuantized[0].length;
         int[][] decodedArray = HelpMe.deepCopy(deQuantized);
@@ -74,16 +71,24 @@ public class PredictiveCompressor implements Compressor {
             for (int j = 1; j < width; j++) {
                 if (Math.min(decodedArray[i][j - 1], decodedArray[i - 1][j]) >= decodedArray[i - 1][j - 1])
                     decodedArray[i][j] = Math.max(decodedArray[i][j - 1], decodedArray[i - 1][j]) + deQuantized[i][j];
-                else if(Math.max(decodedArray[i][j - 1], decodedArray[i - 1][j]) <= decodedArray[i - 1][j - 1])
+                else if (Math.max(decodedArray[i][j - 1], decodedArray[i - 1][j]) <= decodedArray[i - 1][j - 1])
                     decodedArray[i][j] = Math.min(decodedArray[i][j - 1], decodedArray[i - 1][j]) + deQuantized[i][j];
                 else
-                    decodedArray[i][j] = decodedArray[i][j - 1] + decodedArray[i - 1][j] - decodedArray[i - 1][j - 1] + deQuantized[i][j];
+                    decodedArray[i][j] = decodedArray[i][j - 1] + decodedArray[i - 1][j] - decodedArray[i - 1][j - 1]
+                            + deQuantized[i][j];
+
+                if (decodedArray[i][j] > 255)
+                    decodedArray[i][j] = 255;
+
+                else if (decodedArray[i][j] < 0)
+                    decodedArray[i][j] = 0;
             }
         }
         return decodedArray;
     }
+
     @Override
-    public int[][] Decompress(int[][] quantizedDifference) {
+    protected int[][] Decompress(int[][] quantizedDifference) {
         int[][] deQuantized = computeDeQuantizedArray(quantizedDifference);
         return computeDecodedImage(deQuantized);
     }

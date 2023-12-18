@@ -1,13 +1,15 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+
 public class Quantizer {
-    public static List<Integer>[] quantizedData;
+    public static LinkedList<Integer>[] quantizedData;
 
     public static void buildQuantizedData(int mi, int mx, int bits) {
         int codes = (1 << bits);
-        quantizedData = new ArrayList[codes];
+        quantizedData = new LinkedList[codes];
         for (int i = 0; i < codes; i++)
-            quantizedData[i] = new ArrayList<>();
+            quantizedData[i] = new LinkedList<>();
         int step = (mx - mi + 1) / codes, mod = (mx - mi + 1) % codes;
         int start = mi;
         for (int i = 0; i < codes; i++) {
@@ -24,7 +26,7 @@ public class Quantizer {
             for (int j = 0; j < quantizedData[i].size(); j++)
                 if (quantizedData[i].get(j) == val)
                     return i;
-        return Integer.MAX_VALUE;//any value because it will never happen
+        return Integer.MAX_VALUE;// any value because it will never happen
     }
 
     public static int getDeQuantizedCode(int code) {
