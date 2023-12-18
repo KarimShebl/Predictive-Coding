@@ -1,6 +1,5 @@
 public class Main {
     public static void main(String[] args) {
-        int[][] array = { { 5, 7, 8, 10 }, { 6, 6, 9, 11 }, { 7, 8, 11, 13 }, { 9, 10, 11, 14 } };
         PredictiveCompressor p = new PredictiveCompressor();
         int[][] pixelArray = ImageConverter.imageToArray("grey.jpeg");
 
