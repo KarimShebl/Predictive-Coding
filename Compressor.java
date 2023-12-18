@@ -1,5 +1,8 @@
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 abstract public class Compressor {
@@ -45,27 +48,28 @@ abstract public class Compressor {
         binaryHandler.pushFrontBits(blue.length, MAXQUNTIZEDARRAYHEIGHTSIZE);
         binaryHandler.pushFrontBits(blue[0].length, MAXQUNTIZEDARRAYWIDTHSIZE);
 
-        for (int i = 0; i < blue.length; i++) {
-            for (int j = 0; j < blue[i].length; j++) {
-                binaryHandler.pushFrontBits(blue[i][j], MAXQUNTIZEDARRAYCELLSIZE);
+        for (int i = 0; i < quntizedArray.length; i++) {
+            for (int j = 0; j < quntizedArray[i].length; j++) {
+                binaryHandler.pushFrontBits(quntizedArray[i][j], MAXQUNTIZEDARRAYCELLSIZE);
             }
         }
 
         binaryHandler.pushFrontBits(quantizationTable.length, MAXQUNTIZATIONTableLENSIZE);
 
+        int mini, maxi;
         for (int i = 0; i < quantizationTable.length; i++) {
-            binaryHandler.pushFrontBits(quantizationTable[i].size(), MAXQUNTIZATIONTableROWLENSIZE);
-            for (int cell : quantizationTable[i]) {
-                binaryHandler.pushFrontBits(cell, MAXQUNTIZATIONTableCELLSIZE);
-            }
+            mini = quantizationTable[i].getFirst();
+            maxi = quantizationTable[i].getLast();
+            binaryHandler.pushFrontBits(mini, MAXQUNTIZATIONTableCELLSIZE);
+            binaryHandler.pushFrontBits(maxi, MAXQUNTIZATIONTableCELLSIZE);
         }
 
         LinkedList<Byte> compressedStream = binaryHandler.toByteArray();
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(ouputFileName + ".bin"))) {
 
-            for (int i = 0; i < compressedStream.size(); i++) {
-                writer.write(compressedStream.get(i));
+            for (Byte byte1 : compressedStream) {
+                writer.write(byte1);
             }
 
         } catch (Exception e) {
@@ -76,8 +80,6 @@ abstract public class Compressor {
     }
 
     public void deCompress(String inputFileName, String outputFilename) {
-
-        
 
     }
 
